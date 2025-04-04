@@ -4,7 +4,7 @@ const int stepPin = 2;
 const int dirPin = 3;
 const int potPin = A8;
 const int rcOutPin = 9;
-const int stepPinLR = 5;
+const int stepPinLR = 5;  
 const int dirPinLR = 6;
 
 int step = 0;
