@@ -1,0 +1,209 @@
+#include <Servo.h>
+
+const int stepPin = 2;
+const int dirPin = 3;
+const int potPin = A8;
+const int rcOutPin = 9;
+const int stepPinLR = 5;
+const int dirPinLR = 6;
+
+int step = 0;
+const int default_step = 500;
+const int default_speed = 450;
+Servo myservo;
+
+void setup() {
+ // Start the serial communication.
+ pinMode(stepPin, OUTPUT);
+ pinMode(dirPin, OUTPUT);
+ pinMode(stepPinLR, OUTPUT);
+ pinMode(dirPinLR, OUTPUT);
+ Serial.begin(9600);
+ myservo.attach(rcOutPin);
+
+ Serial.println("Making sure actuator is retracted");
+ myservo.writeMicroseconds(1000);
+ delay(1000);
+}
+
+void loop() {
+
+ // Check if data is available to read.
+ if (Serial.available() > 0) {
+   // Read the incoming string.
+   String data = Serial.readStringUntil('\n'); // Assumes input ends with a newline character
+
+   // Trim any whitespace or newlines.
+   data.trim();
+
+   // Example: Check if the received string is "ON".
+   if (data == "w") {
+    
+     Serial.println("Received forward command");
+     step += default_step;
+     digitalWrite(dirPin, LOW);
+     for (int x = 0; x < default_step; x ++)
+     {
+      
+       digitalWrite(stepPin, HIGH);
+       delayMicroseconds(default_speed);
+       digitalWrite(stepPin, LOW);
+       delayMicroseconds(default_speed);
+     }
+     Serial.print("Step count: ");
+     Serial.println(step);
+     Serial.println("\n");
+     // Add code to perform action when "ON" is received
+   } else if (data == "s") 
+     {
+     step += default_step;
+     Serial.println("Received backwards command");
+     digitalWrite(dirPin, HIGH);
+     for (int x = 0; x < default_step; x ++)
+     {
+       digitalWrite(stepPin, HIGH);
+       delayMicroseconds(default_speed);
+       digitalWrite(stepPin, LOW);
+       delayMicroseconds(default_speed);       
+     }
+
+     Serial.print("Step count: ");
+     Serial.println(step);
+     Serial.println("\n");
+     // Add code to perform action when "OFF" is received
+   } else { if ( data == "re")
+   {
+     Serial.println("Received retract");
+     myservo.writeMicroseconds(1000);
+     delay(1000);
+   }
+   else if (data == "ex")
+   {
+     Serial.println("Received extend");
+     myservo.writeMicroseconds(2000);
+     delay(200);
+   }
+   else if (data == "x")
+   {
+     Serial.println("Stopping now");
+     digitalWrite(stepPin, LOW);
+     digitalWrite(stepPinLR, LOW);
+   
+   }
+   else if (data == "a")
+   {
+     step += default_step;
+     digitalWrite(dirPinLR, HIGH);
+     Serial.println("Left");
+     for (int x = 0; x < default_step; x ++)
+     {
+       digitalWrite(stepPinLR, HIGH);
+       delayMicroseconds(default_speed);
+       digitalWrite(stepPinLR, LOW);
+       delayMicroseconds(default_speed);
+     }
+     Serial.print("Step count: ");
+     Serial.println(step);
+     Serial.println("\n");
+   }
+   else if (data == "d")
+   {
+     step += default_step;
+     digitalWrite(dirPinLR, LOW);
+     Serial.println("Right");
+     for (int x = 0; x < default_step; x ++)
+     {
+       digitalWrite(stepPinLR, HIGH);
+       delayMicroseconds(default_speed);
+       digitalWrite(stepPinLR, LOW);
+       delayMicroseconds(default_speed);
+     }
+     Serial.print("Step count: ");
+     Serial.println(step);
+     Serial.println("\n");
+   }
+   else if (data == "r")
+   {
+     step = 0;
+     Serial.println("Steps reset");
+   }
+   else if ( data == "p")
+   {
+     step = 0;
+     //must be origin
+     digitalWrite(dirPinLR, HIGH); //left
+     for (int x = 0; x < 3750; x ++)
+     {
+       digitalWrite(stepPinLR, HIGH);
+       delayMicroseconds(default_speed);
+       digitalWrite(stepPinLR, LOW);
+       delayMicroseconds(default_speed);
+     }
+
+
+     digitalWrite(dirPin, LOW); //forward
+     for (int x = 0; x < 1750; x ++)
+     {
+       digitalWrite(stepPin, HIGH);
+       delayMicroseconds(default_speed);
+       digitalWrite(stepPin, LOW);
+       delayMicroseconds(default_speed);
+     }
+     Serial.println("Received extend");
+     myservo.writeMicroseconds(2000);
+     delay(200);
+     delay(3000);
+     //down
+     Serial.println("Received retract");
+     myservo.writeMicroseconds(1000);
+     delay(1000);
+     delay(3000);
+     digitalWrite(dirPin, LOW); //forward
+     for (int x = 0; x < 5250; x ++)
+     {
+       digitalWrite(stepPin, HIGH);
+       delayMicroseconds(default_speed);
+       digitalWrite(stepPin, LOW);
+       delayMicroseconds(default_speed);
+     }
+     //up
+     Serial.println("Received extend");
+     myservo.writeMicroseconds(2000);
+     delay(200);
+     delay(2000);
+     //down
+     Serial.println("Received retract");
+     myservo.writeMicroseconds(1000);
+     delay(1000);
+     delay(3000);
+
+
+     //back
+     digitalWrite(dirPin, HIGH); //backwards
+     for (int x = 0; x < 7000; x ++)
+     {
+    
+       digitalWrite(stepPin, HIGH);
+       delayMicroseconds(default_speed);
+       digitalWrite(stepPin, LOW);
+       delayMicroseconds(default_speed);       
+     }
+    
+     digitalWrite(dirPinLR, LOW); //right
+     for (int x = 0; x < 3750; x ++)
+     {
+       digitalWrite(stepPinLR, HIGH);
+       delayMicroseconds(default_speed);
+       digitalWrite(stepPinLR, LOW);
+       delayMicroseconds(default_speed);
+     }
+     //right
+   }
+     // Echo the received data back to the terminal.
+     // Serial.print("Received: ");
+     // Serial.println(data);
+   }
+ }
+}
+
+
